@@ -128,3 +128,44 @@ api_post() {
         "${GRAFANA_URL}${ENDPOINT}"
 
 }
+
+
+check_dependencies() {
+
+    require curl
+    require jq
+    require git
+
+}
+
+
+ensure_directories() {
+
+    mkdir -p "$DASHBOARD_DIR"
+    mkdir -p "$LOG_DIR"
+    mkdir -p "$DOCS_DIR"
+
+}
+
+check_grafana() {
+
+    if ! api_get "/api/health" >/dev/null
+    then
+        log ERROR "Unable to connect to Grafana."
+
+        exit 2
+    fi
+
+}
+
+print_summary() {
+
+    echo
+    echo "===================================="
+    echo "Grafana-DR Summary"
+    echo "===================================="
+    echo "Dashboards Processed : $TOTAL"
+    echo "Successful           : $SUCCESS"
+    echo "Failed               : $FAILED"
+    echo
+}
