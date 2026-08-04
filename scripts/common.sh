@@ -103,3 +103,28 @@ api_get() {
         "${GRAFANA_URL}${ENDPOINT}"
 
 }
+
+validate_json() {
+
+    jq empty >/dev/null 2>&1
+
+}
+
+
+api_post() {
+
+    local ENDPOINT="$1"
+    local JSON_FILE="$2"
+
+    curl \
+        --silent \
+        --show-error \
+        --fail \
+        --retry "$API_RETRIES" \
+        --connect-timeout "$API_TIMEOUT" \
+        -H "Authorization: Bearer $TOKEN" \
+        -H "Content-Type: application/json" \
+        --data @"$JSON_FILE" \
+        "${GRAFANA_URL}${ENDPOINT}"
+
+}
