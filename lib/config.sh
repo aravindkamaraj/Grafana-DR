@@ -16,7 +16,7 @@ TOKEN_FILE="$HOME/.config/grafana-dr/token"
 # Repository Paths
 #######################################
 
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+: "${PROJECT_ROOT:?PROJECT_ROOT is not set}"
 
 DASHBOARD_DIR="${PROJECT_ROOT}/dashboards"
 
@@ -38,6 +38,7 @@ API_TIMEOUT=30
 
 API_RETRIES=3
 
+API_MAX_TIME=60
 #######################################
 # Script Version
 #######################################

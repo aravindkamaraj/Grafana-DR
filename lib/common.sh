@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 
-###############################################################################
-# Common Library
-###############################################################################
-
-source "$(dirname "$0")/config.sh"
-
 #######################################
 # Colours
 #######################################
@@ -89,43 +83,9 @@ load_token() {
 }
 
 
-api_get() {
-
-    local ENDPOINT="$1"
-
-    curl \
-        --silent \
-        --show-error \
-        --fail \
-        --retry "$API_RETRIES" \
-        --connect-timeout "$API_TIMEOUT" \
-        -H "Authorization: Bearer $TOKEN" \
-        "${GRAFANA_URL}${ENDPOINT}"
-
-}
-
 validate_json() {
 
     jq empty >/dev/null 2>&1
-
-}
-
-
-api_post() {
-
-    local ENDPOINT="$1"
-    local JSON_FILE="$2"
-
-    curl \
-        --silent \
-        --show-error \
-        --fail \
-        --retry "$API_RETRIES" \
-        --connect-timeout "$API_TIMEOUT" \
-        -H "Authorization: Bearer $TOKEN" \
-        -H "Content-Type: application/json" \
-        --data @"$JSON_FILE" \
-        "${GRAFANA_URL}${ENDPOINT}"
 
 }
 
@@ -147,16 +107,6 @@ ensure_directories() {
 
 }
 
-check_grafana() {
-
-    if ! api_get "/api/health" >/dev/null
-    then
-        log ERROR "Unable to connect to Grafana."
-
-        exit 2
-    fi
-
-}
 
 print_summary() {
 
@@ -168,4 +118,26 @@ print_summary() {
     echo "Successful           : $SUCCESS"
     echo "Failed               : $FAILED"
     echo
+}
+
+
+###############################################################################
+# Project Initialization
+###############################################################################
+
+initialize() {
+
+    banner
+
+    log INFO "Checking dependencies..."
+    check_dependencies
+
+    log INFO "Ensuring project directories..."
+    ensure_directories
+
+    log INFO "Loading Grafana API token..."
+    load_token
+
+    log INFO "Initialization completed."
+
 }

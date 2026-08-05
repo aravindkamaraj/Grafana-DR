@@ -7,20 +7,21 @@
 #
 # This library contains generic HTTP helper functions.
 # It does NOT know anything about Grafana dashboards.
-###############################################################################
-
-source "$(dirname "${BASH_SOURCE[0]}")/config.sh"
-source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
 ###############################################################################
-# Generic HTTP Request
+# api_request
 #
-# Usage:
-# api_request METHOD ENDPOINT [DATA_FILE]
+# Description:
+#   Sends an HTTP request to the Grafana API.
 #
-# Example:
-# api_request GET "/api/search"
-# api_request POST "/api/dashboards/db" dashboard.json
+# Arguments:
+#   $1 - HTTP Method (GET, POST, PUT, DELETE)
+#   $2 - API Endpoint
+#   $3 - JSON payload file (optional)
+#
+# Returns:
+#   Response body on stdout.
+#   curl exit status.
 ###############################################################################
 
 api_request() {
@@ -29,20 +30,21 @@ api_request() {
     local ENDPOINT="$2"
     local DATA_FILE="${3:-}"
 
-    local CURL_ARGS=(
-        --silent
-        --show-error
-        --fail
-        --retry "$API_RETRIES"
-        --connect-timeout "$API_TIMEOUT"
-        -X "$METHOD"
-        -H "Authorization: Bearer $TOKEN"
-    )
+    local CURL_ARGS=()
+
+    CURL_ARGS+=(--silent)
+    CURL_ARGS+=(--show-error)
+    CURL_ARGS+=(--fail)
+    CURL_ARGS+=(--retry "$API_RETRIES")
+    CURL_ARGS+=(--connect-timeout "$API_TIMEOUT")
+    CURL_ARGS+=(--max-time "$API_MAX_TIME")
+    CURL_ARGS+=(-X "$METHOD")
+    CURL_ARGS+=(-H "Authorization: Bearer $TOKEN")
+
 
     if [[ "$METHOD" != "GET" ]]; then
-        CURL_ARGS+=(
-            -H "Content-Type: application/json"
-        )
+        local CONTENT_TYPE="application/json"
+	CURL_ARGS+=(-H "Content-Type: ${CONTENT_TYPE}")
     fi
 
     if [[ -n "$DATA_FILE" ]]; then
@@ -51,8 +53,10 @@ api_request() {
         )
     fi
 
-    curl "${CURL_ARGS[@]}" \
-        "${GRAFANA_URL}${ENDPOINT}"
+    local URL="${GRAFANA_URL}${ENDPOINT}"
+
+    curl "${CURL_ARGS[@]}" "$URL"
+
 }
 
 ###############################################################################
@@ -106,21 +110,30 @@ api_delete() {
 
 }
 
+
 ###############################################################################
 # Verify Grafana API is reachable
 ###############################################################################
+###############################################################################
+# grafana_health
+#
+# Returns:
+#   0 - Grafana is reachable
+#   1 - Grafana is unreachable
+###############################################################################
 
-api_health() {
+grafana_health() {
 
     api_get "/api/health" >/dev/null
 
 }
 
+
 ###############################################################################
 # Return Grafana version
 ###############################################################################
 
-api_version() {
+grafana_version() {
 
     api_get "/api/health" \
         | jq -r '.version'
