@@ -49,7 +49,11 @@ grafana_import_dashboard() {
 
     if ! jq \
         '{
-            dashboard: .dashboard,
+            dashboard: (
+                .dashboard
+                | .id = null
+                | .version = 0
+            ),
             folderUid: null,
             overwrite: true
         }' \
