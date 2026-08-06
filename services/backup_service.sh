@@ -16,6 +16,7 @@ backup_dashboards() {
 
     local DASHBOARD_LIST
     local DASHBOARD
+    BACKUP_CHANGED=0
 
     DASHBOARD_LIST=$(grafana_list_dashboards)
 
@@ -35,14 +36,16 @@ backup_dashboards() {
         fi
     done < <(echo "$DASHBOARD_LIST" | jq -c '.[]')
 
-    if ! manifest_finish; then
-       log ERROR "Failed to generate manifest."
-       exit 1
-    fi
+    if [[ "$BACKUP_CHANGED" -eq 1 ]]; then
+        if ! manifest_finish; then
+            log ERROR "Failed to generate manifest."
+            exit 1
+        fi
 
-    if ! manifest_validate; then
-       log ERROR "Manifest validation failed."
-       exit 1
+        if ! manifest_validate; then
+            log ERROR "Manifest validation failed."
+            exit 1
+        fi
     fi
 
     print_summary
@@ -89,9 +92,10 @@ _backup_dashboard() {
     case "$RESULT" in
 
         $FILE_SUCCESS)
+            BACKUP_CHANGED=1
             log INFO "Saved: ${FILE_NAME}"
             SHA256=$(file_sha256 "$DEST_FILE")
-	    FILE_SIZE=$(stat -c%s "$DEST_FILE")
+	        FILE_SIZE=$(stat -c%s "$DEST_FILE")
 
 	    manifest_add \
     		"$DASHBOARD_UID" \
@@ -104,7 +108,7 @@ _backup_dashboard() {
 
         $FILE_NO_CHANGE)
             log INFO "No changes: ${FILE_NAME}"
-	    SHA256=$(file_sha256 "$DEST_FILE")
+	        SHA256=$(file_sha256 "$DEST_FILE")
             FILE_SIZE=$(stat -c%s "$DEST_FILE")
 
             manifest_add \
