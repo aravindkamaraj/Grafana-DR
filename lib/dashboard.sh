@@ -30,17 +30,42 @@ grafana_export_dashboard() {
 }
 
 ###############################################################################
-# grafana_import_dashboard
+# Import a Grafana dashboard.
 #
 # Arguments:
-#   $1 - JSON file
+#   $1 - Dashboard backup JSON file
+#
+# Returns:
+#   0 - Dashboard imported successfully
+#   1 - Import failed
 ###############################################################################
 
 grafana_import_dashboard() {
 
     local JSON_FILE="$1"
+    local TEMP_FILE
 
-    api_post "/api/dashboards/db" "$JSON_FILE"
+    TEMP_FILE=$(file_create_temp)
+
+    if ! jq \
+        '{
+            dashboard: .dashboard,
+            folderUid: null,
+            overwrite: true
+        }' \
+        "$JSON_FILE" > "$TEMP_FILE"
+    then
+        file_remove_temp "$TEMP_FILE"
+        return 1
+    fi
+
+    api_post "/api/dashboards/db" "$TEMP_FILE"
+
+    local RESULT=$?
+
+    file_remove_temp "$TEMP_FILE"
+
+    return $RESULT
 
 }
 

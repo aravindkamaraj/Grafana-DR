@@ -24,6 +24,8 @@ backup_dashboards() {
     SUCCESS=0
     FAILED=0
 
+    manifest_begin
+
     while read -r DASHBOARD
     do
         if _backup_dashboard "$DASHBOARD"; then
@@ -32,6 +34,16 @@ backup_dashboards() {
             FAILED=$((FAILED + 1))
         fi
     done < <(echo "$DASHBOARD_LIST" | jq -c '.[]')
+
+    if ! manifest_finish; then
+       log ERROR "Failed to generate manifest."
+       exit 1
+    fi
+
+    if ! manifest_validate; then
+       log ERROR "Manifest validation failed."
+       exit 1
+    fi
 
     print_summary
 }
@@ -51,6 +63,8 @@ _backup_dashboard() {
     local FILE_NAME
     local DEST_FILE
     local RESULT
+    local SHA256
+    local FILE_SIZE
 
     DASHBOARD_UID=$(echo "$DASHBOARD" | jq -r '.uid')
     DASHBOARD_TITLE=$(echo "$DASHBOARD" | jq -r '.title')
@@ -76,11 +90,29 @@ _backup_dashboard() {
 
         $FILE_SUCCESS)
             log INFO "Saved: ${FILE_NAME}"
+            SHA256=$(file_sha256 "$DEST_FILE")
+	    FILE_SIZE=$(stat -c%s "$DEST_FILE")
+
+	    manifest_add \
+    		"$DASHBOARD_UID" \
+    		"$DASHBOARD_TITLE" \
+    		"$FILE_NAME" \
+    		"$SHA256" \
+    		"$FILE_SIZE"
             return 0
             ;;
 
         $FILE_NO_CHANGE)
             log INFO "No changes: ${FILE_NAME}"
+	    SHA256=$(file_sha256 "$DEST_FILE")
+            FILE_SIZE=$(stat -c%s "$DEST_FILE")
+
+            manifest_add \
+                "$DASHBOARD_UID" \
+                "$DASHBOARD_TITLE" \
+                "$FILE_NAME" \
+                "$SHA256" \
+                "$FILE_SIZE"
             return 0
             ;;
 
