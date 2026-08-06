@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-06T10:53:24Z",
+  "generated_at": "2026-08-06T18:53:47Z",
   "grafana_version": "13.1.1",
   "dashboard_count": 1,
   "dashboards": [
@@ -7,8 +7,8 @@
       "uid": "adpj4mw",
       "title": "Host Temperature",
       "file": "host-temperature__adpj4mw.json",
-      "sha256": "779e260f0da38c11cd364de8ef02a349492afafb5c745d755ef9d51738bbedd2",
-      "size": 10734
+      "sha256": "db68db4b55f19a8acf92aafdceff87dc67b3fa5de742e3accbaadc9f43267cf3",
+      "size": 10727
     }
   ]
 }
