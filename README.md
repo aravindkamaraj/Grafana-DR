@@ -1,4 +1,4 @@
-Grafana-DR
+# Grafana-DR
 
 A lightweight Disaster Recovery (DR) toolkit for Grafana dashboards written entirely in Bash.
 
@@ -6,7 +6,7 @@ Grafana-DR automates the backup, version control, and restoration of Grafana das
 
 ---
 
-Features
+## Features
 
 * Backup all Grafana dashboards through the Grafana HTTP API
 * Restore dashboards to another Grafana instance
@@ -22,7 +22,7 @@ Features
 
 ---
 
-Architecture
+## Architecture
 
 ```
                     Primary Grafana
@@ -59,7 +59,7 @@ Architecture
 
 ---
 
-Project Structure
+## Project Structure
 
 ```
 Grafana-DR/
@@ -99,7 +99,7 @@ Grafana-DR/
 
 ---
 
-Requirements
+## Requirements
 
 * Bash 5+
 * curl
@@ -110,7 +110,7 @@ Requirements
 
 ---
 
-Configuration
+## Configuration
 
 Configure the following values inside `lib/config.sh`.
 
@@ -126,9 +126,9 @@ Store the Grafana Service Account Token separately and never commit it into Git.
 
 ---
 
-How It Works
+## How It Works
 
-Backup Workflow
+### Backup Workflow
 
 ```
 Initialize
@@ -163,7 +163,7 @@ Git Commit & Push
 
 ---
 
-Restore Workflow
+### Restore Workflow
 
 ```
 Initialize
@@ -189,7 +189,7 @@ Verify Success
 
 ---
 
-Cross-Instance Restore
+## Cross-Instance Restore
 
 Grafana exports and imports use different JSON formats.
 
@@ -207,7 +207,7 @@ This allows dashboards to be restored into a different Grafana installation.
 
 ---
 
-Git Integration
+## Git Integration
 
 Grafana-DR automatically integrates with Git.
 
@@ -245,15 +245,15 @@ Only meaningful configuration changes are committed.
 
 ---
 
-Disaster Recovery Workflow
+## Disaster Recovery Workflow
 
-Primary Server
+### Primary Server
 
 * Grafana runs normally.
 * Scheduled backups execute automatically.
 * Dashboard backups are committed to Git.
 
-Standby Server
+### Standby Server
 
 Grafana remains stopped to conserve system resources.
 
@@ -274,19 +274,23 @@ Production Ready
 
 ---
 
-Usage
+## Usage
 
-Backup Dashboards
+### Backup Dashboards
 
+```bash
 ./backup-grafana.sh
+```
 
-Restore Dashboards
+### Restore Dashboards
 
+```bash
 ./restore-grafana.sh
+```
 
 ---
 
-Design Goals
+## Design Goals
 
 * Minimal resource usage
 * Modular architecture
@@ -298,7 +302,7 @@ Design Goals
 
 ---
 
-Technologies Used
+## Technologies Used
 
 * Bash
 * Grafana HTTP API
@@ -309,7 +313,8 @@ Technologies Used
 * JSON
 
 ---
-Future Enhancements
+
+## Future Enhancements
 
 * Dashboard folder synchronization
 * Datasource backup and restore
@@ -323,12 +328,12 @@ Future Enhancements
 
 ---
 
-Version
+## Version
 
 Current Release: **v1.1.0**
 
 ---
 
-License
+## License
 
 This project is released under the MIT License.
