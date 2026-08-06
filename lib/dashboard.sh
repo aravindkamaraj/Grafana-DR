@@ -65,6 +65,8 @@ grafana_import_dashboard() {
 
     file_remove_temp "$TEMP_FILE"
 
+    printf '%s\n' "$RESPONSE"
+
     return $RESULT
 
 }
