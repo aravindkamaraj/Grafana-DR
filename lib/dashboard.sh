@@ -59,9 +59,11 @@ grafana_import_dashboard() {
         return 1
     fi
 
-    api_post "/api/dashboards/db" "$TEMP_FILE"
-
-    local RESULT=$?
+    local RESPONSE
+    local RESULT
+    
+    RESPONSE=$(api_post "/api/dashboards/db" "$TEMP_FILE")
+    RESULT=$?
 
     file_remove_temp "$TEMP_FILE"
 
