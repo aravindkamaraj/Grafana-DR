@@ -54,4 +54,4 @@ API_MAX_TIME=60
 # Script Version
 #######################################
 
-VERSION="1.0.0"
+VERSION=$(<"${PROJECT_ROOT}/VERSION")
